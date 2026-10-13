@@ -1,0 +1,684 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pujo Parikrama | Pandal, Metro & Rail Guide</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{--wine:#651629;--deep:#300b18;--gold:#d9ac56;--cream:#fff8ed;--line:#eadbca}
+*{box-sizing:border-box}
+body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:var(--cream);color:#30201e}
+a{color:inherit}
+button,input,select{font:inherit}
+header{background:var(--deep);color:white;padding:15px 5%;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.brand{font-size:23px;font-weight:800;color:#f5d18a;text-decoration:none}
+nav{display:flex;gap:18px;flex-wrap:wrap}
+nav a{color:#fff0dc;text-decoration:none;font-size:14px}
+.hero{padding:65px 7%;color:white;background:linear-gradient(90deg,#2b0716ee,#521324bb),url("https://commons.wikimedia.org/wiki/Special:FilePath/Idol_of_Goddess_Durga_in_a_Panadal_at_Kolkata_07.jpg") center/cover;min-height:340px;display:flex;align-items:center}
+.hero div{max-width:780px}
+.hero small{color:#f4cc7c;letter-spacing:3px;text-transform:uppercase;font-weight:bold}
+h1{font: bold clamp(38px,6vw,68px)/1.05 Georgia,serif;margin:18px 0}
+h1 span{color:#f4cc7c}
+.hero p{line-height:1.8;max-width:640px;color:#ffeadb}
+.btn{display:inline-block;padding:12px 17px;border-radius:8px;text-decoration:none;font-weight:750;background:var(--gold);color:#32101b;border:0;cursor:pointer}
+.stats{max-width:1200px;margin:20px auto 0;padding:0 18px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.stat,.panel,.card,.tip{background:white;border:1px solid var(--line);border-radius:13px;padding:18px}
+.stat strong{display:block;font-size:26px;color:var(--wine)}
+.stat span{font-size:13px;color:#786d68}
+main{max-width:1400px;margin:auto;padding:35px 20px 60px}
+h2{font: bold clamp(27px,3vw,37px) Georgia,serif;color:var(--deep);margin:8px 0}
+h3{color:var(--wine)}
+.kicker{font-size:11px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;color:#9b6c25}
+.sub{color:#786d68;line-height:1.7}
+.section{margin-top:40px}
+.layout{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(270px,.75fr);gap:16px}
+.panel{padding:0;overflow:hidden;min-width:0}
+.panelhead{padding:16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+#map{height:610px;width:100%;background:#eee4d6}
+.mapnote{font-size:12px;color:#786d68;padding:12px 16px;line-height:1.6}
+.filters{padding:20px}
+label{display:block;font-size:12px;font-weight:800;margin:15px 0 7px;color:#60463d}
+input,select{width:100%;padding:11px;border:1px solid #dfcebd;border-radius:8px;background:#fffdf9;color:#30201e}
+.checkrow{display:flex;align-items:center;gap:8px;margin:12px 0;font-size:13px}
+.checkrow input{width:auto}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.chip{padding:8px 10px;border:1px solid #e6d4c2;border-radius:30px;background:#fff8ef;cursor:pointer;font-size:12px}
+.chip.active{background:var(--wine);color:white}
+.legend{display:grid;gap:8px;margin-top:15px;font-size:13px}
+.legendrow{display:flex;align-items:center;gap:8px}
+.swatch{width:25px;height:5px;border-radius:5px;display:inline-block}
+.notice{padding:12px;background:#fff1d4;color:#6c4a1c;border-radius:8px;font-size:12px;line-height:1.65;margin-top:16px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0}
+.toolbar input{flex:1 1 250px}
+.toolbar select{max-width:250px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+.card{display:flex;flex-direction:column;min-width:0}
+.card h3{font-size:17px;margin:0;line-height:1.4}
+.tag{display:inline-block;background:#f7e8e4;color:#852c3b;border-radius:30px;padding:6px 9px;font-size:11px;margin:10px 0;align-self:flex-start}
+.card p{font-size:13px;color:#786d68;line-height:1.65;flex:1}
+.actions{display:flex;gap:7px;flex-wrap:wrap}
+.actions button,.actions a{border:1px solid #e3d1c0;background:#fff8ef;border-radius:7px;padding:9px 10px;font-size:12px;font-weight:bold;text-decoration:none;cursor:pointer;color:var(--wine)}
+.actions a{background:var(--wine);color:white}
+.routebox{padding:18px;background:white;border:1px solid var(--line);border-radius:13px}
+.routebox .btn{margin-top:12px}
+#routeResult{line-height:1.8;color:#51403a;font-size:14px;margin-top:12px}
+.tips{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.tip p{font-size:13px;color:#786d68;line-height:1.7}
+footer{background:var(--deep);color:#f7e7d5;padding:30px 6%;display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}
+footer strong{color:var(--gold)}
+.empty{grid-column:1/-1;text-align:center;padding:30px;background:white;border:1px dashed var(--line);border-radius:12px}
+.metro-label{font-weight:bold;color:#32101b}
+@media(max-width:950px){.layout{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.grid,.tips,.stats{grid-template-columns:1fr}.hero{padding:45px 6%}main{padding:28px 13px}#map{height:470px}header{padding:13px 5%}}
+</style>
+</head>
+<body>
+<header>
+  <a class="brand" href="#">🪔 Pujo Parikrama</a>
+  <nav>
+    <a href="#mapSection">Transport Map</a>
+    <a href="#directory">Pandals</a>
+    <a href="#planner">Route Finder</a>
+    <a href="#tips">Visitor Tips</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div>
+    <small>Sharodiya • Explore West Bengal</small>
+    <h1>Celebrate Bengal.<br><span>Travel smarter.</span></h1>
+    <p>Discover Durga Puja pandals, explore Kolkata Metro lines and major suburban rail corridors, and plan your Pujo journey from one place.</p>
+    <a class="btn" href="#mapSection">Explore the interactive map ↗</a>
+  </div>
+</section>
+
+<div class="stats">
+  <div class="stat"><strong id="pandalTotal">0</strong><span>Pandal directory entries</span></div>
+  <div class="stat"><strong>5</strong><span>Metro line overlays</span></div>
+  <div class="stat"><strong>2</strong><span>Major suburban rail hubs: Howrah and Sealdah</span></div>
+</div>
+
+<main>
+<section class="section" id="mapSection">
+  <div class="kicker">Explore & navigate</div>
+  <h2>Pujo + Metro + Rail map</h2>
+  <p class="sub">Turn transport layers on or off. Click a station or pandal marker for details.</p>
+
+  <div class="layout">
+    <div class="panel">
+      <div class="panelhead">
+        <strong>🗺️ Kolkata transport and pandals</strong>
+        <span id="mapStatus" class="sub">Loading map…</span>
+      </div>
+      <div id="map"></div>
+      <div class="mapnote">Map tiles © Esri and contributors. Metro and rail corridors are illustrative route overlays, not survey-grade track geometry or live train tracking.</div>
+    </div>
+
+    <aside class="panel filters">
+      <h3 style="margin-top:0">Map controls</h3>
+      <label for="mapSearch">Search pandals / districts</label>
+      <input id="mapSearch" type="search" placeholder="Try Bagbazar, Howrah, Nadia…">
+
+      <label for="region">Filter region</label>
+      <select id="region">
+        <option value="All">All regions</option>
+        <option>Kolkata</option>
+        <option>Kolkata Suburbs</option>
+        <option>Howrah & Hooghly</option>
+        <option>Bardhaman & Asansol</option>
+        <option>South Bengal</option>
+        <option>North Bengal</option>
+      </select>
+
+      <label>Show transport layers</label>
+      <div class="checkrow"><input type="checkbox" id="showPandals" checked><span>🪔 Pandal markers</span></div>
+      <div class="checkrow"><input type="checkbox" id="showMetro" checked><span>🚇 Metro routes and stations</span></div>
+      <div class="checkrow"><input type="checkbox" id="showRail" checked><span>🚆 Suburban rail corridors</span></div>
+
+      <div class="legend">
+        <div class="legendrow"><span class="swatch" style="background:#1976d2"></span>Blue Line</div>
+        <div class="legendrow"><span class="swatch" style="background:#178f62"></span>Green Line</div>
+        <div class="legendrow"><span class="swatch" style="background:#d7a600"></span>Yellow Line</div>
+        <div class="legendrow"><span class="swatch" style="background:#8e44ad"></span>Purple Line</div>
+        <div class="legendrow"><span class="swatch" style="background:#ef7d32"></span>Orange Line</div>
+        <div class="legendrow"><span class="swatch" style="background:#555;border-top:2px dashed #555"></span>Rail corridors</div>
+      </div>
+
+      <div class="notice"><strong>Service reminder:</strong> Lines, station access, operating sections and Puja timetables can change. Check current Metro Railway and Indian Railways notices before travel. This map does not provide live train positions.</div>
+      <p style="font-size:13px;line-height:1.8;margin-top:16px">
+        <a href="https://mtp.indianrailways.gov.in/" target="_blank" rel="noopener">Metro Railway Kolkata official site ↗</a><br>
+        <a href="https://kmrc.in/" target="_blank" rel="noopener">Kolkata Metro Rail Corporation ↗</a><br>
+        <a href="https://www.indianrail.gov.in/" target="_blank" rel="noopener">Indian Railways ↗</a>
+      </p>
+    </aside>
+  </div>
+</section>
+
+<section class="section" id="planner">
+  <div class="kicker">Plan your journey</div>
+  <h2>Metro route finder</h2>
+  <p class="sub">Choose two stations to see the line sequence and interchange suggestions. This is a basic station-list planner, not a live timetable or fare calculator.</p>
+  <div class="routebox">
+    <div class="layout">
+      <div>
+        <label for="fromStation">From station</label>
+        <select id="fromStation"></select>
+      </div>
+      <div>
+        <label for="toStation">To station</label>
+        <select id="toStation"></select>
+      </div>
+    </div>
+    <button class="btn" id="findRoute">Find route</button>
+    <div id="routeResult" aria-live="polite"></div>
+  </div>
+</section>
+
+<section class="section" id="directory">
+  <div class="kicker">Pandal directory</div>
+  <h2>Find a Durga Puja destination</h2>
+  <p class="sub">Search by pandal, town, district or region. Select “Show on map” to locate a directory entry.</p>
+  <div class="toolbar">
+    <input id="directorySearch" type="search" placeholder="Search pandal, district or town…">
+    <select id="directoryRegion">
+      <option value="All">All regions</option>
+      <option>Kolkata</option>
+      <option>Kolkata Suburbs</option>
+      <option>Howrah & Hooghly</option>
+      <option>Bardhaman & Asansol</option>
+      <option>South Bengal</option>
+      <option>North Bengal</option>
+    </select>
+  </div>
+  <p id="resultCount" class="sub"></p>
+  <div class="grid" id="directoryGrid"></div>
+  <div class="notice">Some entries outside Kolkata are approximate town or area guide points rather than verified pandal entrances. Verify the exact committee address and coordinates before relying on them for navigation.</div>
+</section>
+
+<section class="section" id="tips">
+  <div class="kicker">Enjoy the festival</div>
+  <h2>Before you set out</h2>
+  <div class="tips">
+    <article class="tip"><h3>🚇 Check Metro updates</h3><p>Verify the operating section, station access, last train and special Puja services before starting.</p></article>
+    <article class="tip"><h3>🚆 Check train schedules</h3><p>Confirm suburban train routes and special services through the railway's official channels.</p></article>
+    <article class="tip"><h3>🪔 Plan by neighbourhood</h3><p>Group nearby pandals together and allow extra time for queues, walking diversions and crowd control.</p></article>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div><strong>Pujo Parikrama</strong><br>A festival and transport guide for West Bengal.</div>
+  <div>Map data is for trip planning only.<br>Confirm local conditions before travelling.</div>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const pandals = [
+{name:"Bagbazar Sarbojanin",region:"Kolkata",district:"Kolkata",lat:22.6019,lng:88.3651,desc:"Historic North Kolkata puja"},
+{name:"Kumartuli Park",region:"Kolkata",district:"Kolkata",lat:22.5995,lng:88.3617,desc:"Traditional artistry and creative pandal"},
+{name:"Ahiritola Sarbojanin",region:"Kolkata",district:"Kolkata",lat:22.5982,lng:88.3567,desc:"Heritage North Kolkata puja"},
+{name:"Hatibagan Sarbojanin",region:"Kolkata",district:"Kolkata",lat:22.6007,lng:88.3724,desc:"Popular neighbourhood puja"},
+{name:"Nalin Sarkar Street",region:"Kolkata",district:"Kolkata",lat:22.6015,lng:88.3747,desc:"North Kolkata community puja"},
+{name:"Sikdar Bagan Sadharan",region:"Kolkata",district:"Kolkata",lat:22.5974,lng:88.3721,desc:"Traditional Durga Puja"},
+{name:"Manicktala Chaltabagan",region:"Kolkata",district:"Kolkata",lat:22.5858,lng:88.3717,desc:"Central-North Kolkata puja"},
+{name:"Belgachia Sarbojanin",region:"Kolkata",district:"Kolkata",lat:22.6082,lng:88.3835,desc:"North Kolkata community puja"},
+{name:"Mohammad Ali Park",region:"Kolkata",district:"Kolkata",lat:22.5797,lng:88.3612,desc:"Central Kolkata pandal"},
+{name:"College Square",region:"Kolkata",district:"Kolkata",lat:22.5748,lng:88.3637,desc:"Famous lakeside puja"},
+{name:"Santosh Mitra Square",region:"Kolkata",district:"Kolkata",lat:22.5708,lng:88.3657,desc:"Popular Central Kolkata attraction"},
+{name:"Ekdalia Evergreen Club",region:"Kolkata",district:"Kolkata",lat:22.5193,lng:88.3657,desc:"Traditional Ballygunge puja"},
+{name:"Badamtala Ashar Sangha",region:"Kolkata",district:"Kolkata",lat:22.5198,lng:88.3445,desc:"Renowned South Kolkata puja"},
+{name:"Chetla Agrani Club",region:"Kolkata",district:"Kolkata",lat:22.5090,lng:88.3280,desc:"South Kolkata themed puja"},
+{name:"Suruchi Sangha",region:"Kolkata",district:"Kolkata",lat:22.5050,lng:88.3190,desc:"New Alipore community puja"},
+{name:"Mudiali Club",region:"Kolkata",district:"Kolkata",lat:22.5107,lng:88.3450,desc:"South Kolkata puja"},
+{name:"Hindustan Park Sarbojanin",region:"Kolkata",district:"Kolkata",lat:22.5190,lng:88.3650,desc:"Creative neighbourhood puja"},
+{name:"Tridhara Sammilani",region:"Kolkata",district:"Kolkata",lat:22.5100,lng:88.3650,desc:"South Kolkata pandal"},
+{name:"Ballygunge Cultural Association",region:"Kolkata",district:"Kolkata",lat:22.5250,lng:88.3650,desc:"Cultural Durga Puja"},
+{name:"66 Pally",region:"Kolkata",district:"Kolkata",lat:22.5160,lng:88.3500,desc:"South Kolkata community puja"},
+{name:"Jodhpur Park Sarbojanin",region:"Kolkata",district:"Kolkata",lat:22.5010,lng:88.3650,desc:"Jodhpur Park neighbourhood puja"},
+{name:"Deshapriya Park",region:"Kolkata",district:"Kolkata",lat:22.5155,lng:88.3530,desc:"South Kolkata festival destination"},
+{name:"Bosepukur Sitala Mandir",region:"Kolkata",district:"Kolkata",lat:22.5130,lng:88.3700,desc:"Known for themed pandals"},
+{name:"Samaj Sebi Sangha",region:"Kolkata",district:"Kolkata",lat:22.5100,lng:88.3520,desc:"South Kolkata community puja"},
+{name:"Singhi Park Sarbojanin",region:"Kolkata",district:"Kolkata",lat:22.5180,lng:88.3660,desc:"Traditional South Kolkata puja"},
+{name:"Sreebhumi Sporting Club",region:"Kolkata Suburbs",district:"North 24 Parganas",lat:22.6098,lng:88.4260,desc:"Lake Town themed puja"},
+{name:"Dum Dum Park Tarun Sangha",region:"Kolkata Suburbs",district:"North 24 Parganas",lat:22.6090,lng:88.4130,desc:"Lake Town area pandal"},
+{name:"FD Block Durga Puja",region:"Kolkata Suburbs",district:"North 24 Parganas",lat:22.5865,lng:88.4170,desc:"Salt Lake community puja"},
+{name:"Baranagar Town Puja",region:"Kolkata Suburbs",district:"North 24 Parganas",lat:22.6410,lng:88.3650,desc:"Approximate Baranagar area point",approx:true},
+{name:"Madhyamgram Town Puja",region:"Kolkata Suburbs",district:"North 24 Parganas",lat:22.6900,lng:88.4500,desc:"Approximate town guide point",approx:true},
+{name:"Barasat Town Puja",region:"Kolkata Suburbs",district:"North 24 Parganas",lat:22.7200,lng:88.4800,desc:"Approximate town guide point",approx:true},
+{name:"Barrackpore Town Puja",region:"Kolkata Suburbs",district:"North 24 Parganas",lat:22.7600,lng:88.3700,desc:"Approximate town guide point",approx:true},
+{name:"Naihati Town Puja",region:"Kolkata Suburbs",district:"North 24 Parganas",lat:22.8900,lng:88.4200,desc:"Approximate town guide point",approx:true},
+{name:"Howrah Maidan Area Puja",region:"Howrah & Hooghly",district:"Howrah",lat:22.5890,lng:88.3100,desc:"Approximate Howrah area point",approx:true},
+{name:"Shibpur Neighbourhood Puja",region:"Howrah & Hooghly",district:"Howrah",lat:22.5550,lng:88.2970,desc:"Approximate Shibpur area point",approx:true},
+{name:"Uttar Salkia Area Puja",region:"Howrah & Hooghly",district:"Howrah",lat:22.6000,lng:88.3400,desc:"Approximate Salkia area point",approx:true},
+{name:"Bagnan Town Puja",region:"Howrah & Hooghly",district:"Howrah",lat:22.4700,lng:87.9700,desc:"Approximate town guide point",approx:true},
+{name:"Chandannagar Town Puja",region:"Howrah & Hooghly",district:"Hooghly",lat:22.8670,lng:88.3670,desc:"Explore Chandannagar puja neighbourhoods",approx:true},
+{name:"Serampore Town Puja",region:"Howrah & Hooghly",district:"Hooghly",lat:22.7500,lng:88.3400,desc:"Approximate town guide point",approx:true},
+{name:"Chinsurah Town Puja",region:"Howrah & Hooghly",district:"Hooghly",lat:22.9000,lng:88.3900,desc:"Approximate town guide point",approx:true},
+{name:"Bandel Town Puja",region:"Howrah & Hooghly",district:"Hooghly",lat:22.9300,lng:88.3800,desc:"Approximate town guide point",approx:true},
+{name:"Bardhaman Town Puja",region:"Bardhaman & Asansol",district:"Purba Bardhaman",lat:23.2400,lng:87.8700,desc:"Approximate town guide point",approx:true},
+{name:"Durgapur Town Puja",region:"Bardhaman & Asansol",district:"Paschim Bardhaman",lat:23.5500,lng:87.2900,desc:"Approximate town guide point",approx:true},
+{name:"Asansol Town Puja",region:"Bardhaman & Asansol",district:"Paschim Bardhaman",lat:23.6800,lng:86.9800,desc:"Approximate town guide point",approx:true},
+{name:"Raniganj Town Puja",region:"Bardhaman & Asansol",district:"Paschim Bardhaman",lat:23.6200,lng:87.1300,desc:"Approximate town guide point",approx:true},
+{name:"Krishnanagar Town Puja",region:"South Bengal",district:"Nadia",lat:23.4000,lng:88.5000,desc:"Approximate town guide point",approx:true},
+{name:"Kalyani Town Puja",region:"South Bengal",district:"Nadia",lat:22.9800,lng:88.4800,desc:"Approximate town guide point",approx:true},
+{name:"Ranaghat Town Puja",region:"South Bengal",district:"Nadia",lat:23.1800,lng:88.5800,desc:"Approximate town guide point",approx:true},
+{name:"Baharampur Town Puja",region:"South Bengal",district:"Murshidabad",lat:24.1000,lng:88.2500,desc:"Approximate town guide point",approx:true},
+{name:"Midnapore Town Puja",region:"South Bengal",district:"Paschim Medinipur",lat:22.4300,lng:87.3200,desc:"Approximate town guide point",approx:true},
+{name:"Kharagpur Town Puja",region:"South Bengal",district:"Paschim Medinipur",lat:22.3400,lng:87.3200,desc:"Approximate town guide point",approx:true},
+{name:"Tamluk Town Puja",region:"South Bengal",district:"Purba Medinipur",lat:22.3000,lng:87.9200,desc:"Approximate town guide point",approx:true},
+{name:"Haldia Town Puja",region:"South Bengal",district:"Purba Medinipur",lat:22.0600,lng:88.0600,desc:"Approximate town guide point",approx:true},
+{name:"Diamond Harbour Town Puja",region:"South Bengal",district:"South 24 Parganas",lat:22.1900,lng:88.1900,desc:"Approximate town guide point",approx:true},
+{name:"Bankura Town Puja",region:"South Bengal",district:"Bankura",lat:23.2300,lng:87.0700,desc:"Approximate town guide point",approx:true},
+{name:"Bishnupur Town Puja",region:"South Bengal",district:"Bankura",lat:23.0700,lng:87.3200,desc:"Approximate town guide point",approx:true},
+{name:"Purulia Town Puja",region:"South Bengal",district:"Purulia",lat:23.3300,lng:86.3600,desc:"Approximate town guide point",approx:true},
+{name:"Suri Town Puja",region:"South Bengal",district:"Birbhum",lat:23.9100,lng:87.5300,desc:"Approximate town guide point",approx:true},
+{name:"Bolpur Town Puja",region:"South Bengal",district:"Birbhum",lat:23.6700,lng:87.6900,desc:"Approximate town guide point",approx:true},
+{name:"Siliguri Town Puja",region:"North Bengal",district:"Darjeeling",lat:26.7100,lng:88.4300,desc:"Approximate town guide point",approx:true},
+{name:"Jalpaiguri Town Puja",region:"North Bengal",district:"Jalpaiguri",lat:26.5200,lng:88.7300,desc:"Approximate town guide point",approx:true},
+{name:"Cooch Behar Town Puja",region:"North Bengal",district:"Cooch Behar",lat:26.3300,lng:89.4500,desc:"Approximate town guide point",approx:true},
+{name:"Alipurduar Town Puja",region:"North Bengal",district:"Alipurduar",lat:26.4900,lng:89.5300,desc:"Approximate town guide point",approx:true},
+{name:"Malda Town Puja",region:"North Bengal",district:"Malda",lat:25.0100,lng:88.1400,desc:"Approximate town guide point",approx:true},
+{name:"Balurghat Town Puja",region:"North Bengal",district:"Dakshin Dinajpur",lat:25.2200,lng:88.7700,desc:"Approximate town guide point",approx:true},
+{name:"Raiganj Town Puja",region:"North Bengal",district:"Uttar Dinajpur",lat:25.6200,lng:88.1200,desc:"Approximate town guide point",approx:true}
+,
+{name:"Shyambazar Five Point Crossing Puja",region:"Kolkata",district:"Kolkata",lat:22.6010,lng:88.3730,desc:"North Kolkata area guide",approx:true},
+{name:"Shobhabazar Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5960,lng:88.3670,desc:"Shobhabazar area guide",approx:true},
+{name:"Jorasanko Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5845,lng:88.3590,desc:"North-Central Kolkata area guide",approx:true},
+{name:"Beniatola Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5880,lng:88.3630,desc:"Beniatola area guide",approx:true},
+{name:"Chitpur Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.6060,lng:88.3670,desc:"Chitpur area guide",approx:true},
+{name:"Tala Park Area Puja",region:"Kolkata",district:"Kolkata",lat:22.6050,lng:88.3820,desc:"Tala neighbourhood guide",approx:true},
+{name:"Paikpara Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.6060,lng:88.3780,desc:"Paikpara area guide",approx:true},
+{name:"Belgachia Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.6080,lng:88.3800,desc:"Belgachia area guide",approx:true},
+{name:"Cossipore Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.6150,lng:88.3700,desc:"Cossipore area guide",approx:true},
+{name:"Dum Dum Road Puja",region:"Kolkata Suburbs",district:"North 24 Parganas",lat:22.6240,lng:88.3950,desc:"Dum Dum Road area guide",approx:true},
+{name:"Nagerbazar Neighbourhood Puja",region:"Kolkata Suburbs",district:"North 24 Parganas",lat:22.6190,lng:88.4180,desc:"Nagerbazar area guide",approx:true},
+{name:"Motijheel Neighbourhood Puja",region:"Kolkata Suburbs",district:"North 24 Parganas",lat:22.6260,lng:88.4140,desc:"Motijheel area guide",approx:true},
+{name:"Lake Town Block A Puja",region:"Kolkata Suburbs",district:"North 24 Parganas",lat:22.6050,lng:88.4050,desc:"Lake Town area guide",approx:true},
+{name:"Lake Town Block B Puja",region:"Kolkata Suburbs",district:"North 24 Parganas",lat:22.6080,lng:88.4070,desc:"Lake Town area guide",approx:true},
+{name:"Bangur Avenue Community Puja",region:"Kolkata Suburbs",district:"North 24 Parganas",lat:22.6090,lng:88.4140,desc:"Bangur Avenue area guide",approx:true},
+{name:"Dum Dum Park Community Puja",region:"Kolkata Suburbs",district:"North 24 Parganas",lat:22.6120,lng:88.4130,desc:"Dum Dum Park area guide",approx:true},
+{name:"Arjunpur Neighbourhood Puja",region:"Kolkata Suburbs",district:"North 24 Parganas",lat:22.6320,lng:88.4260,desc:"Arjunpur area guide",approx:true},
+{name:"Baguiati Neighbourhood Puja",region:"Kolkata Suburbs",district:"North 24 Parganas",lat:22.6200,lng:88.4310,desc:"Baguiati area guide",approx:true},
+{name:"Kestopur Neighbourhood Puja",region:"Kolkata Suburbs",district:"North 24 Parganas",lat:22.6000,lng:88.4320,desc:"Kestopur area guide",approx:true},
+{name:"Kaikhali Neighbourhood Puja",region:"Kolkata Suburbs",district:"North 24 Parganas",lat:22.6350,lng:88.4350,desc:"Kaikhali area guide",approx:true},
+{name:"New Town Action Area I Puja",region:"Kolkata Suburbs",district:"North 24 Parganas",lat:22.5790,lng:88.4700,desc:"New Town area guide",approx:true},
+{name:"New Town Action Area II Puja",region:"Kolkata Suburbs",district:"North 24 Parganas",lat:22.5850,lng:88.4750,desc:"New Town area guide",approx:true},
+{name:"New Town Action Area III Puja",region:"Kolkata Suburbs",district:"North 24 Parganas",lat:22.5900,lng:88.4800,desc:"New Town area guide",approx:true},
+{name:"Salt Lake Sector I Community Puja",region:"Kolkata Suburbs",district:"North 24 Parganas",lat:22.5880,lng:88.4140,desc:"Salt Lake area guide",approx:true},
+{name:"Salt Lake Sector II Community Puja",region:"Kolkata Suburbs",district:"North 24 Parganas",lat:22.5810,lng:88.4140,desc:"Salt Lake area guide",approx:true},
+{name:"Salt Lake Sector III Community Puja",region:"Kolkata Suburbs",district:"North 24 Parganas",lat:22.5740,lng:88.4140,desc:"Salt Lake area guide",approx:true},
+{name:"Salt Lake Karunamoyee Area Puja",region:"Kolkata Suburbs",district:"North 24 Parganas",lat:22.5860,lng:88.4080,desc:"Karunamoyee area guide",approx:true},
+{name:"Ultadanga Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5900,lng:88.3900,desc:"Ultadanga area guide",approx:true},
+{name:"Kankurgachi Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5800,lng:88.3930,desc:"Kankurgachi area guide",approx:true},
+{name:"Phoolbagan Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5730,lng:88.3900,desc:"Phoolbagan area guide",approx:true},
+{name:"Beliaghata Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5650,lng:88.3930,desc:"Beliaghata area guide",approx:true},
+{name:"CIT Road Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5680,lng:88.3850,desc:"CIT Road area guide",approx:true},
+{name:"Tangra Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5500,lng:88.3900,desc:"Tangra area guide",approx:true},
+{name:"Topsia Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5450,lng:88.3900,desc:"Topsia area guide",approx:true},
+{name:"Park Circus Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5450,lng:88.3650,desc:"Park Circus area guide",approx:true},
+{name:"Entally Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5560,lng:88.3690,desc:"Entally area guide",approx:true},
+{name:"Moulali Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5630,lng:88.3690,desc:"Moulali area guide",approx:true},
+{name:"Taltala Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5600,lng:88.3560,desc:"Taltala area guide",approx:true},
+{name:"Bowbazar Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5700,lng:88.3630,desc:"Bowbazar area guide",approx:true},
+{name:"Burrabazar Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5800,lng:88.3570,desc:"Burrabazar area guide",approx:true},
+{name:"Posta Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5830,lng:88.3560,desc:"Posta area guide",approx:true},
+{name:"Amherst Street Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5810,lng:88.3690,desc:"Amherst Street area guide",approx:true},
+{name:"Raja Bazar Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5810,lng:88.3710,desc:"Raja Bazar area guide",approx:true},
+{name:"Beckbagan Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5460,lng:88.3610,desc:"Beckbagan area guide",approx:true},
+{name:"Ripon Street Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5570,lng:88.3590,desc:"Ripon Street area guide",approx:true},
+{name:"Park Street Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5520,lng:88.3520,desc:"Park Street area guide",approx:true},
+{name:"Loudon Street Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5460,lng:88.3570,desc:"Loudon Street area guide",approx:true},
+{name:"Bentinck Street Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5680,lng:88.3540,desc:"Bentinck Street area guide",approx:true},
+{name:"Lalbazar Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5680,lng:88.3560,desc:"Lalbazar area guide",approx:true},
+{name:"Alipore Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5310,lng:88.3290,desc:"Alipore area guide",approx:true},
+{name:"Kidderpore Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5350,lng:88.3210,desc:"Kidderpore area guide",approx:true},
+{name:"Mominpur Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5290,lng:88.3190,desc:"Mominpur area guide",approx:true},
+{name:"Ekbalpur Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5360,lng:88.3190,desc:"Ekbalpur area guide",approx:true},
+{name:"Garden Reach Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5390,lng:88.2900,desc:"Garden Reach area guide",approx:true},
+{name:"Metiabruz Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5530,lng:88.2730,desc:"Metiabruz area guide",approx:true},
+{name:"Taratala Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5090,lng:88.3150,desc:"Taratala area guide",approx:true},
+{name:"Behala Chowrasta Area Puja",region:"Kolkata",district:"Kolkata",lat:22.4900,lng:88.3170,desc:"Behala area guide",approx:true},
+{name:"Behala Bazar Area Puja",region:"Kolkata",district:"Kolkata",lat:22.5000,lng:88.3180,desc:"Behala area guide",approx:true},
+{name:"Parnasree Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.4890,lng:88.3000,desc:"Parnasree area guide",approx:true},
+{name:"Sarsuna Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.4650,lng:88.2920,desc:"Sarsuna area guide",approx:true},
+{name:"Barisha Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.4740,lng:88.3150,desc:"Barisha area guide",approx:true},
+{name:"Sakher Bazar Area Puja",region:"Kolkata",district:"Kolkata",lat:22.4780,lng:88.3070,desc:"Sakher Bazar area guide",approx:true},
+{name:"Thakurpukur Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.4560,lng:88.3040,desc:"Thakurpukur area guide",approx:true},
+{name:"Haridevpur Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.4790,lng:88.3300,desc:"Haridevpur area guide",approx:true},
+{name:"New Alipore Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5100,lng:88.3260,desc:"New Alipore area guide",approx:true},
+{name:"Chetla Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5080,lng:88.3290,desc:"Chetla area guide",approx:true},
+{name:"Kalighat Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5180,lng:88.3440,desc:"Kalighat area guide",approx:true},
+{name:"Rashbehari Avenue Area Puja",region:"Kolkata",district:"Kolkata",lat:22.5150,lng:88.3510,desc:"Rashbehari Avenue area guide",approx:true},
+{name:"Gariahat Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5190,lng:88.3650,desc:"Gariahat area guide",approx:true},
+{name:"Golpark Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5170,lng:88.3670,desc:"Golpark area guide",approx:true},
+{name:"Fern Road Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5160,lng:88.3690,desc:"Fern Road area guide",approx:true},
+{name:"Lake Gardens Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5050,lng:88.3500,desc:"Lake Gardens area guide",approx:true},
+{name:"Dhakuria Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5070,lng:88.3690,desc:"Dhakuria area guide",approx:true},
+{name:"Selimpur Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5050,lng:88.3710,desc:"Selimpur area guide",approx:true},
+{name:"Jadavpur Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.4960,lng:88.3690,desc:"Jadavpur area guide",approx:true},
+{name:"Bijoygarh Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.4860,lng:88.3670,desc:"Bijoygarh area guide",approx:true},
+{name:"Baghajatin Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.4770,lng:88.3750,desc:"Baghajatin area guide",approx:true},
+{name:"Patuli Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.4730,lng:88.3850,desc:"Patuli area guide",approx:true},
+{name:"Garia Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.4630,lng:88.3900,desc:"Garia area guide",approx:true},
+{name:"Bansdroni Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.4680,lng:88.3610,desc:"Bansdroni area guide",approx:true},
+{name:"Regent Park Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.4800,lng:88.3500,desc:"Regent Park area guide",approx:true},
+{name:"Netaji Nagar Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.4810,lng:88.3600,desc:"Netaji Nagar area guide",approx:true},
+{name:"Tollygunge Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.4980,lng:88.3460,desc:"Tollygunge area guide",approx:true},
+{name:"Golf Green Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.4830,lng:88.3590,desc:"Golf Green area guide",approx:true},
+{name:"Jodhpur Park Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5020,lng:88.3650,desc:"Jodhpur Park area guide",approx:true},
+{name:"Prince Anwar Shah Road Area Puja",region:"Kolkata",district:"Kolkata",lat:22.5030,lng:88.3610,desc:"Prince Anwar Shah Road area guide",approx:true},
+{name:"Santoshpur Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.4900,lng:88.3860,desc:"Santoshpur area guide",approx:true},
+{name:"Bosepukur Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5160,lng:88.3870,desc:"Bosepukur area guide",approx:true},
+{name:"Kasba Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5140,lng:88.3850,desc:"Kasba area guide",approx:true},
+{name:"Rajdanga Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5140,lng:88.4000,desc:"Rajdanga area guide",approx:true},
+{name:"Tiljala Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5370,lng:88.3830,desc:"Tiljala area guide",approx:true},
+{name:"Picnic Garden Neighbourhood Puja",region:"Kolkata",district:"Kolkata",lat:22.5360,lng:88.3770,desc:"Picnic Garden area guide",approx:true},
+// ================================
+// TAMLUK — PURBA MEDINIPUR
+// ================================
+{name:"Aaradhya Durga Puja",region:"South Bengal",district:"Purba Medinipur",lat:22.2960,lng:87.9230,desc:"Tamluk area guide",approx:true},
+{ name: "Tamralipta Sebak Sangha", city: "Tamluk", area: "Uttar Chara Sankarara", lat: 22.2890, lng: 87.9270, approx: true },
+{ name: "Tamluk Padumbasan Durga Puja", city: "Tamluk", area: "Padumbasan", lat: 22.2910, lng: 87.9260, approx: true },
+{ name: "Tamluk Abasbari Durga Puja", city: "Tamluk", area: "Abasbari", lat: 22.2940, lng: 87.9180, approx: true },
+{ name: "Payratungi Durga Mondir", city: "Tamluk", area: "Uttar Chara Sankarara", lat: 22.2800, lng: 87.9390, approx: true },
+{ name: "Paschim Anchal Unnayan Club Puja", city: "Tamluk", area: "Padumbasan", lat: 22.2870, lng: 87.9300, approx: true },
+
+// ================================
+// MIDNAPORE — PASCHIM MEDINIPUR
+// ================================
+{ name: "Keranitola Durga Puja Mandap", city: "Midnapore", area: "Keranitola", lat: 22.4240, lng: 87.3230, approx: true },
+{ name: "Rabindranagar Durga Puja Ground", city: "Midnapore", area: "Rabindra Nagar", lat: 22.4270, lng: 87.3290, approx: true },
+{ name: "Srijoni SCA Durga Puja", city: "Midnapore", area: "Saratpally", lat: 22.4210, lng: 87.3260, approx: true },
+{ name: "Bidhannagar Purba Sarbojanin Durga Puja", city: "Midnapore", area: "Bidhan Nagar", lat: 22.4310, lng: 87.3300, approx: true },
+{ name: "Burdge Town Durga Puja Mandap", city: "Midnapore", area: "Burdge Town", lat: 22.4190, lng: 87.3310, approx: true },
+{ name: "Ashoknagar Sarbajanin Durga Puja", city: "Midnapore", area: "Ashok Nagar", lat: 22.4290, lng: 87.3340, approx: true },
+{ name: "Chhotobazar Sarbojanin Durga Puja", city: "Midnapore", area: "Chhotobazar", lat: 22.4230, lng: 87.3190, approx: true },
+{ name: "Natun Bazar Durga Puja", city: "Midnapore", area: "Natun Bazar", lat: 22.4200, lng: 87.3220, approx: true },
+{ name: "Rangamati Sarbojonin Durga Puja", city: "Midnapore", area: "Rangamati", lat: 22.4380, lng: 87.3250, approx: true },
+{ name: "Najargunj Samajbari Durga Puja", city: "Midnapore", area: "Najargunj", lat: 22.4150, lng: 87.3270, approx: true },
+
+// ================================
+// HALDIA — PURBA MEDINIPUR
+// ================================
+{ name: "Milan Sangha Durga Puja", city: "Haldia", area: "Durgachak", lat: 22.0600, lng: 88.0920, approx: true },
+{ name: "Durgachak Azad Sangha", city: "Haldia", area: "Durgachak", lat: 22.0620, lng: 88.0950, approx: true },
+{ name: "Haldia Durgotsav Maidan", city: "Haldia", area: "Kshudiram Nagar", lat: 22.0710, lng: 88.0870, approx: true },
+{ name: "Haldia Township Durga Puja", city: "Haldia", area: "Haldia Township", lat: 22.0550, lng: 88.1000, approx: true },
+{ name: "Durgachak Community Puja", city: "Haldia", area: "Durgachak", lat: 22.0640, lng: 88.0900, approx: true },
+
+// ================================
+// KHARAGPUR — PASCHIM MEDINIPUR
+// ================================
+{ name: "Netaji Byamagar Talbagicha Durga Puja", city: "Kharagpur", area: "Talbagicha", lat: 22.3440, lng: 87.2830, approx: true },
+{ name: "Prembazar Durga Puja Mandap", city: "Kharagpur", area: "Prembazar", lat: 22.3490, lng: 87.2700, approx: true },
+{ name: "Mathurakati Durga Puja Area", city: "Kharagpur", area: "Mathurakati", lat: 22.3470, lng: 87.2920, approx: true },
+{ name: "DVC Area Durga Puja Pandal", city: "Kharagpur", area: "Rabindrapally", lat: 22.3190, lng: 87.3110, approx: true },
+{ name: "Vivekananda Pally Puja Committee", city: "Kharagpur", area: "Vivekananda Pally", lat: 22.3370, lng: 87.3090, approx: true },
+{ name: "South Side Puja Committee", city: "Kharagpur", area: "South Side", lat: 22.3290, lng: 87.3210, approx: true },
+{ name: "Sanghasree Club Durga Puja", city: "Kharagpur", area: "Kharagpur", lat: 22.3400, lng: 87.3150, approx: true },
+{ name: "Kalaikunda Chaturmukh Durga Puja", city: "Kharagpur", area: "Kalaikunda", lat: 22.3390, lng: 87.2250, approx: true },
+
+// ================================
+// CONTAI / KANTHI
+// ================================
+{ name: "Contai Town Durga Puja", city: "Contai", area: "Contai town centre", lat: 21.7800, lng: 87.7480, approx: true },
+{ name: "Contai Station Area Puja", city: "Contai", area: "Station area", lat: 21.7790, lng: 87.7460, approx: true },
+{ name: "Contai Market Area Puja", city: "Contai", area: "Market area", lat: 21.7810, lng: 87.7500, approx: true },
+
+// ================================
+// PANSKURA
+// ================================
+{ name: "Panskura Town Durga Puja", city: "Panskura", area: "Town centre", lat: 22.3830, lng: 87.7450, approx: true },
+{ name: "Panskura Station Area Puja", city: "Panskura", area: "Railway station area", lat: 22.3820, lng: 87.7500, approx: true },
+
+// ================================
+// JHARGRAM
+// ================================
+{ name: "Jhargram Town Durga Puja", city: "Jhargram", area: "Town centre", lat: 22.4530, lng: 86.9970, approx: true },
+{ name: "Jhargram Rajbari Area Puja", city: "Jhargram", area: "Rajbari area", lat: 22.4560, lng: 86.9850, approx: true },
+{ name: "Jhargram Station Area Puja", city: "Jhargram", area: "Station area", lat: 22.4510, lng: 86.9910, approx: true },
+
+// ================================
+// BANKURA / BISHNUPUR
+// ================================
+{ name: "Bankura Town Durga Puja", city: "Bankura", area: "Town centre", lat: 23.2320, lng: 87.0710, approx: true },
+{ name: "Bankura Machantala Area Puja", city: "Bankura", area: "Machantala", lat: 23.2350, lng: 87.0670, approx: true },
+{ name: "Bishnupur Town Durga Puja", city: "Bishnupur", area: "Town centre", lat: 23.0740, lng: 87.3190, approx: true },
+{ name: "Bishnupur Rasmancha Area Puja", city: "Bishnupur", area: "Rasmancha area", lat: 23.0760, lng: 87.3200, approx: true },
+
+// ================================
+// DURGAPUR / ASANSOL
+// ================================
+{ name: "Durgapur City Centre Puja", city: "Durgapur", area: "City Centre", lat: 23.5200, lng: 87.3120, approx: true },
+{ name: "Benachity Durga Puja", city: "Durgapur", area: "Benachity", lat: 23.5360, lng: 87.3040, approx: true },
+{ name: "Bidhannagar Durgapur Puja", city: "Durgapur", area: "Bidhannagar", lat: 23.5550, lng: 87.2950, approx: true },
+{ name: "Asansol Town Durga Puja", city: "Asansol", area: "Town centre", lat: 23.6840, lng: 86.9660, approx: true },
+{ name: "Burnpur Durga Puja", city: "Asansol", area: "Burnpur", lat: 23.6680, lng: 86.9340, approx: true },
+
+// ================================
+// SILIGURI / MALDA
+// ================================
+{ name: "Siliguri Town Durga Puja", city: "Siliguri", area: "Hill Cart Road area", lat: 26.7190, lng: 88.4140, approx: true },
+{ name: "Siliguri Hakimpara Durga Puja", city: "Siliguri", area: "Hakimpara", lat: 26.7130, lng: 88.4210, approx: true },
+{ name: "Siliguri Sevoke Road Puja", city: "Siliguri", area: "Sevoke Road", lat: 26.7270, lng: 88.4320, approx: true },
+{ name: "Malda Town Durga Puja", city: "Malda", area: "English Bazar", lat: 25.0100, lng: 88.1420, approx: true },
+{ name: "Malda Station Area Puja", city: "Malda", area: "Station area", lat: 25.0090, lng: 88.1280, approx: true },
+
+// ================================
+// KRISHNANAGAR / BERHAMPORE
+// ================================
+{ name: "Krishnanagar Town Durga Puja", city: "Krishnanagar", area: "Town centre", lat: 23.4050, lng: 88.4910, approx: true },
+{ name: "Krishnanagar Rajbari Area Puja", city: "Krishnanagar", area: "Rajbari area", lat: 23.4060, lng: 88.5050, approx: true },
+{ name: "Berhampore Town Durga Puja", city: "Berhampore", area: "Town centre", lat: 24.0980, lng: 88.2670, approx: true },
+{ name: "Berhampore Station Area Puja", city: "Berhampore", area: "Station area", lat: 24.1000, lng: 88.2550, approx: true },
+
+// ================================
+// CHANDANNAGAR / HOWRAH
+// ================================
+{ name: "Chandannagar Town Durga Puja", city: "Chandannagar", area: "Town centre", lat: 22.8660, lng: 88.3670, approx: true },
+{ name: "Chandannagar Strand Area Puja", city: "Chandannagar", area: "Strand area", lat: 22.8640, lng: 88.3700, approx: true },
+{ name: "Howrah Town Durga Puja", city: "Howrah", area: "Howrah Maidan area", lat: 22.5890, lng: 88.3100, approx: true },
+{ name: "Shibpur Durga Puja", city: "Howrah", area: "Shibpur", lat: 22.5570, lng: 88.3050, approx: true },
+{ name: "Bally Durga Puja", city: "Howrah", area: "Bally", lat: 22.6500, lng: 88.3400, approx: true }
+];
+
+// Metro station coordinates. Route polylines are illustrative, not track-accurate.
+const metroLines = [
+{key:"Blue",name:"Blue Line",color:"#1976d2",stations:[
+["Dakshineswar",22.655,88.357],["Baranagar",22.641,88.379],["Noapara",22.623,88.384],["Dum Dum",22.620,88.392],["Belgachia",22.604,88.391],["Shyambazar",22.601,88.373],["Shobhabazar Sutanuti",22.595,88.367],["Girish Park",22.585,88.363],["Mahatma Gandhi Road",22.581,88.360],["Central",22.575,88.359],["Chandni Chowk",22.568,88.360],["Esplanade",22.565,88.351],["Park Street",22.553,88.352],["Maidan",22.548,88.346],["Rabindra Sadan",22.540,88.346],["Netaji Bhavan",22.531,88.344],["Jatin Das Park",22.524,88.344],["Kalighat",22.518,88.344],["Rabindra Sarobar",22.507,88.346],["Mahanayak Uttam Kumar",22.475,88.346],["Netaji",22.462,88.347],["Masterda Surya Sen",22.450,88.348],["Gitanjali",22.438,88.349],["Kavi Nazrul",22.425,88.350],["Shahid Khudiram",22.414,88.351],["Kavi Subhash",22.403,88.402]]},
+{key:"Green",name:"Green Line",color:"#178f62",stations:[
+["Howrah Maidan",22.583,88.312],["Howrah",22.585,88.342],["Mahakaran",22.572,88.347],["Esplanade",22.565,88.351],["Sealdah",22.567,88.369],["Phoolbagan",22.573,88.386],["Salt Lake Stadium",22.569,88.400],["Bengal Chemical",22.575,88.414],["City Centre",22.586,88.417],["Central Park",22.589,88.423],["Karunamoyee",22.592,88.426],["Salt Lake Sector V",22.580,88.430]]},
+{key:"Yellow",name:"Yellow Line",color:"#d7a600",stations:[
+["Noapara",22.623,88.384],["Dum Dum Cantonment",22.633,88.414],["Jessore Road",22.651,88.427],["Jai Hind Airport",22.654,88.446]]},
+{key:"Purple",name:"Purple Line",color:"#8e44ad",stations:[
+["Joka",22.452,88.300],["Thakurpukur",22.465,88.309],["Sakher Bazar",22.477,88.316],["Behala Chowrasta",22.490,88.317],["Behala Bazar",22.500,88.318],["Taratala",22.508,88.319],["Majerhat",22.520,88.322]]},
+{key:"Orange",name:"Orange Line",color:"#ef7d32",stations:[
+["Kavi Subhash",22.403,88.402],["Satyajit Ray",22.418,88.407],["Jyotirindra Nandi",22.431,88.411],["Kavi Sukanta",22.445,88.414],["Hemanta Mukhopadhyay",22.466,88.402],["VIP Bazar",22.500,88.400],["Ritwik Ghatak",22.516,88.407],["Barun Sengupta",22.535,88.413],["Beleghata",22.557,88.413]]}
+];
+
+// Approximate regional rail corridors. These are not every track or service.
+const railRoutes = [
+{name:"Howrah–Bandel corridor",stations:[
+["Howrah",22.585,88.342],["Liluah",22.625,88.347],["Belur",22.630,88.355],["Bally",22.650,88.360],["Uttarpara",22.670,88.350],["Hind Motor",22.680,88.350],["Konnagar",22.700,88.350],["Rishra",22.720,88.340],["Serampore",22.750,88.340],["Sheoraphuli",22.770,88.340],["Bandel",22.930,88.380]]},
+{name:"Howrah–Bardhaman corridor",stations:[
+["Howrah",22.585,88.342],["Bally",22.650,88.360],["Dankuni",22.680,88.290],["Bardhaman",23.240,87.870]]},
+{name:"Sealdah–Naihati corridor",stations:[
+["Sealdah",22.567,88.369],["Dum Dum",22.620,88.392],["Barrackpore",22.760,88.370],["Naihati",22.890,88.420]]},
+{name:"Sealdah–Krishnanagar corridor",stations:[
+["Sealdah",22.567,88.369],["Bidhan Nagar Road",22.590,88.400],["Dum Dum",22.620,88.392],["Barasat",22.720,88.480],["Ranaghat",23.180,88.580],["Krishnanagar City Junction",23.400,88.500]]},
+{name:"Sealdah–Canning corridor",stations:[
+["Sealdah",22.567,88.369],["Ballygunge",22.527,88.366],["Sonarpur",22.449,88.392],["Baruipur",22.360,88.430],["Canning",22.320,88.670]]},
+{name:"Sealdah–Diamond Harbour corridor",stations:[
+["Sealdah",22.567,88.369],["Ballygunge",22.527,88.366],["Sonarpur",22.449,88.392],["Baruipur",22.360,88.430],["Diamond Harbour",22.190,88.190]]}
+];
+
+const $ = id => document.getElementById(id);
+const map = L.map("map").setView([22.58,88.38],10);
+L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",{
+maxZoom:19,attribution:"Tiles © Esri and contributors"
+}).addTo(map);
+
+const pandalLayer=L.layerGroup().addTo(map);
+const metroLayer=L.layerGroup().addTo(map);
+const railLayer=L.layerGroup().addTo(map);
+const markerIndex=new Map();
+
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function mapsURL(lat,lng){return "https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(lat+","+lng);}
+function addPandalMarkers(){
+  pandalLayer.clearLayers();markerIndex.clear();
+  const q=$("mapSearch").value.trim().toLowerCase();
+  const region=$("region").value;
+  const visible=pandals.filter(p=>{
+    const text=[p.name,p.region,p.district,p.desc].join(" ").toLowerCase();
+    return (!q||text.includes(q))&&(region==="All"||p.region===region);
+  });
+  visible.forEach(p=>{
+    const m=L.marker([p.lat,p.lng]);
+    m.bindPopup(`<b>${esc(p.name)}</b><br>${esc(p.district)} · ${esc(p.region)}<br>${esc(p.desc)}${p.approx?'<br><em>Approximate area marker</em>':''}<br><a target="_blank" rel="noopener" href="${mapsURL(p.lat,p.lng)}">Get directions ↗</a>`);
+    m.addTo(pandalLayer);markerIndex.set(p.name,m);
+  });
+  $("mapStatus").textContent=visible.length+" pandal markers shown";
+  renderDirectory();
+}
+function drawMetro(){
+  metroLayer.clearLayers();
+  metroLines.forEach(line=>{
+    const points=line.stations.map(s=>[s[1],s[2]]);
+    L.polyline(points,{color:line.color,weight:5,opacity:.85}).addTo(metroLayer)
+      .bindPopup(`<b>${line.name}</b><br>Illustrative route overlay`);
+    line.stations.forEach(s=>{
+      const m=L.circleMarker([s[1],s[2]],{radius:4,color:line.color,weight:2,fillColor:"white",fillOpacity:1});
+      m.bindPopup(`<b>${esc(s[0])}</b><br><span style="color:${line.color}">${line.name}</span>`);
+      m.addTo(metroLayer);
+    });
+  });
+}
+function drawRail(){
+  railLayer.clearLayers();
+  railRoutes.forEach(route=>{
+    L.polyline(route.stations.map(s=>[s[1],s[2]]),{
+      color:"#555",weight:3,opacity:.85,dashArray:"8 7"
+    }).addTo(railLayer).bindPopup(`<b>${esc(route.name)}</b><br>Approximate corridor — check actual train service.`);
+    route.stations.forEach(s=>{
+      L.circleMarker([s[1],s[2]],{radius:3,color:"#555",fillColor:"#fff",fillOpacity:1,weight:2})
+       .bindPopup(`<b>${esc(s[0])}</b><br>Suburban rail corridor marker`)
+       .addTo(railLayer);
+    });
+  });
+}
+function renderDirectory(){
+  const q=$("directorySearch").value.trim().toLowerCase();
+  const region=$("directoryRegion").value;
+  const list=pandals.filter(p=>{
+    const text=[p.name,p.region,p.district,p.desc].join(" ").toLowerCase();
+    return (!q||text.includes(q))&&(region==="All"||p.region===region);
+  });
+  $("resultCount").textContent=list.length+" result(s)";
+  $("directoryGrid").innerHTML=list.length?list.map(p=>`
+    <article class="card">
+      <h3>${esc(p.name)}</h3>
+      <span class="tag">${esc(p.region)}</span>
+      <p><b>${esc(p.district)}</b><br>${esc(p.desc)}${p.approx?"<br><em>Approximate guide point; verify exact venue.</em>":""}</p>
+      <div class="actions">
+        <button data-show="${esc(p.name)}">Show on map</button>
+        <a href="${mapsURL(p.lat,p.lng)}" target="_blank" rel="noopener">Directions ↗</a>
+      </div>
+    </article>`).join(""):'<div class="empty">No matching pandals. Try another search.</div>';
+  $("directoryGrid").querySelectorAll("[data-show]").forEach(b=>b.addEventListener("click",()=>{
+    const name=b.dataset.show,p=pandals.find(x=>x.name===name);
+    $("mapSearch").value="";
+    $("directorySearch").value="";
+    $("region").value="All";
+    $("directoryRegion").value="All";
+    addPandalMarkers();
+    const m=markerIndex.get(name);
+    if(m){map.flyTo(m.getLatLng(),15);m.openPopup();$("mapSection").scrollIntoView({behavior:"smooth"});}
+  }));
+}
+
+$("mapSearch").addEventListener("input",addPandalMarkers);
+$("directorySearch").addEventListener("input",renderDirectory);
+$("directoryRegion").addEventListener("change",renderDirectory);
+$("region").addEventListener("change",()=>{
+  addPandalMarkers();
+  const r=$("region").value;
+  const views={
+    "All":[[21.45,85.80],[27.25,89.95]],
+    "Kolkata":[[22.48,88.30],[22.66,88.42]],
+    "Kolkata Suburbs":[[22.58,88.32],[22.92,88.52]],
+    "Howrah & Hooghly":[[22.40,88.20],[23.00,88.48]],
+    "Bardhaman & Asansol":[[23.0,86.7],[23.8,88.1]],
+    "South Bengal":[[21.5,85.9],[24.3,88.7]],
+    "North Bengal":[[24.7,87.8],[27.1,89.8]]
+  };
+  map.fitBounds(views[r]||views.All,{padding:[15,15]});
+});
+$("showPandals").addEventListener("change",e=>e.target.checked?map.addLayer(pandalLayer):map.removeLayer(pandalLayer));
+$("showMetro").addEventListener("change",e=>e.target.checked?map.addLayer(metroLayer):map.removeLayer(metroLayer));
+$("showRail").addEventListener("change",e=>e.target.checked?map.addLayer(railLayer):map.removeLayer(railLayer));
+
+drawMetro();drawRail();addPandalMarkers();
+$("pandalTotal").textContent=pandals.length;
+
+// Station planner: station sequence along one line, or via a shared interchange.
+const allStations=[];
+metroLines.forEach(line=>line.stations.forEach(s=>{
+  if(!allStations.some(x=>x.name===s[0]))allStations.push({name:s[0],lat:s[1],lng:s[2]});
+}));
+function fillStationSelects(){
+  const opts=allStations.map(s=>`<option value="${esc(s.name)}">${esc(s.name)}</option>`).join("");
+  $("fromStation").innerHTML=opts;
+  $("toStation").innerHTML=opts;
+  $("fromStation").value="Shyambazar";
+  $("toStation").value="Esplanade";
+}
+function stationLine(name){return metroLines.filter(line=>line.stations.some(s=>s[0]===name));}
+function linePath(line,from,to){
+  const a=line.stations.findIndex(s=>s[0]===from),b=line.stations.findIndex(s=>s[0]===to);
+  if(a<0||b<0)return null;
+  const step=a<=b?1:-1,arr=[];
+  for(let i=a;;i+=step){arr.push(line.stations[i][0]);if(i===b)break;}
+  return arr;
+}
+function findMetroRoute(){
+  const from=$("fromStation").value,to=$("toStation").value;
+  if(from===to){$("routeResult").innerHTML="You selected the same station for both ends.";return;}
+  let found=null;
+  for(const line of metroLines){
+    const path=linePath(line,from,to);
+    if(path){found={lines:[line],paths:[path]};break;}
+  }
+  if(!found){
+    outer:for(const l1 of metroLines){
+      const p1= l1.stations.findIndex(s=>s[0]===from);
+      if(p1<0)continue;
+      for(const l2 of metroLines){
+        if(l1===l2)continue;
+        const shared=l1.stations.map(s=>s[0]).find(name=>l2.stations.some(t=>t[0]===name));
+        if(!shared)continue;
+        const a=linePath(l1,from,shared),b=linePath(l2,shared,to);
+        if(a&&b){found={lines:[l1,l2],paths:[a,b],shared};break outer;}
+      }
+    }
+  }
+  if(!found){
+    $("routeResult").innerHTML=`A route was not found in this simplified planner. Please use the official <a href="https://mtp.indianrailways.gov.in/" target="_blank" rel="noopener">Metro Railway website</a> or a current route planner.`;
+    return;
+  }
+  let html=`<b>${esc(from)} → ${esc(to)}</b><br>`;
+  found.lines.forEach((line,i)=>{
+    html+=`<p><b style="color:${line.color}">${line.name}</b><br>${found.paths[i].map(esc).join(" → ")}</p>`;
+  });
+  if(found.shared)html+=`<b>Change at:</b> ${esc(found.shared)}<br>`;
+  html+=`<span style="color:#786d68">Station sequence only. Train timings, fares, service status and platform changes are not included.</span>`;
+  $("routeResult").innerHTML=html;
+}
+fillStationSelects();
+$("findRoute").addEventListener("click",findMetroRoute);
+findMetroRoute();
+</script>
+</body>
+</html>
